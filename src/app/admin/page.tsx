@@ -6,12 +6,22 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(formData: FormData) {
+  // Fungsi wrapper untuk memanggil Server Action
+  async function handleAction(formData: FormData) {
     setLoading(true);
     setError(null);
-    const result = await login(formData);
-    if (result?.error) {
-      setError(result.error);
+    
+    try {
+      const result = await login(formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    } catch (err) {
+      // Next.js redirect memicu error 'NEXT_REDIRECT', ini normal dan harus diabaikan
+      if ((err as Error).message !== "NEXT_REDIRECT") {
+        setError("Terjadi kesalahan koneksi.");
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -26,7 +36,8 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <form action={handleSubmit} className="space-y-8">
+        {/* Gunakan action={handleAction} */}
+        <form action={handleAction} className="space-y-8">
           <div className="group">
             <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-neutral-400 group-focus-within:text-black transition-colors">Username</label>
             <input 
@@ -52,7 +63,7 @@ export default function AdminLoginPage() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-[#2C1810] text-white py-4 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black transition-all"
+            className="w-full bg-[#2C1810] text-white py-4 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-black transition-all disabled:bg-neutral-200"
           >
             {loading ? "Verifying..." : "Login"}
           </button>

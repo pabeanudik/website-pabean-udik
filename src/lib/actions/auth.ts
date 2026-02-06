@@ -5,25 +5,30 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
-  const username = formData.get("username");
-  const password = formData.get("password");
+  const username = (formData.get("username") as string)?.trim();
+  const password = (formData.get("password") as string)?.trim();
 
-  if (
-    username === process.env.ADMIN_USERNAME &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    // Set cookie sederhana untuk sesi (berlaku 24 jam)
+  // Ambil dari Environment Variables Vercel
+  const expectedUser = process.env.ADMIN_USERNAME?.trim();
+  const expectedPass = process.env.ADMIN_PASSWORD?.trim();
+
+  // Log ini sangat penting! Cek di Vercel Dashboard > Logs
+  console.log(`LOGIN_ATTEMPT: User=${username}, Expected=${expectedUser}`);
+
+  if (username === expectedUser && password === expectedPass && expectedUser !== undefined) {
     const cookieStore = await cookies();
     cookieStore.set("admin_session", "true", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       maxAge: 60 * 60 * 24,
       path: "/",
+      sameSite: "lax",
     });
     
+    // Redirect ke dashboard
     redirect("/admin/dashboard");
   } else {
-    return { error: "Kredensial salah." };
+    return { error: "Username atau Password salah." };
   }
 }
 
