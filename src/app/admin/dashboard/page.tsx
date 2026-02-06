@@ -7,9 +7,8 @@ import { createProduct, deleteProduct } from "@/lib/actions/product";
 import { createPost, deletePost, updateHero, createHero, deleteHero, updateProfile } from "@/lib/actions/cms"; 
 import { motion, AnimatePresence } from "framer-motion";
 
-export const dynamic = "force-dynamic";
-
-export default function DashboardPage() {
+// CATATAN: Jangan gunakan 'export const dynamic' di file yang memakai "use client"
+// Next.js 15 akan menganggap ini error modul.
 
 type TabType = "hero" | "artikel" | "katalog" | "profil";
 
@@ -67,12 +66,13 @@ export default function DashboardPage() {
       if (activeTab === "katalog") {
         await createProduct(formData, imageUrl);
       } else if (activeTab === "artikel") {
+        const title = formData.get("title") as string;
         const data = {
-          title: formData.get("title") as string,
+          title: title,
           content: formData.get("content") as string,
           image: imageUrl,
           isFeatured: formData.get("isFeatured") === "on",
-          slug: (formData.get("title") as string).toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
+          slug: title.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "")
         };
         await createPost(data);
       } else if (activeTab === "hero") {
@@ -85,8 +85,8 @@ export default function DashboardPage() {
       } else if (activeTab === "profil") {
         const data = {
           title: formData.get("title") as string,
-          description1: formData.get("description") as string, // Disatukan jadi satu field
-          description2: "", // Dikosongkan karena permintaan 1 paragraf
+          description1: formData.get("description") as string,
+          description2: "", 
           imageUrl: imageUrl || undefined 
         };
         await updateProfile(data);
@@ -97,6 +97,7 @@ export default function DashboardPage() {
       if (activeTab !== "profil") (e.target as HTMLFormElement).reset();
       fetchData();
     } catch (err) {
+      console.error(err);
       alert("Terjadi kesalahan sistem.");
     } finally {
       setLoading(false);
@@ -141,8 +142,6 @@ export default function DashboardPage() {
 
           <div className="bg-white p-10 shadow-sm border border-neutral-100">
             <form onSubmit={handleSubmit} className="space-y-10">
-              
-              {/* FORM PROFIL DESA - Versi Ringkas 1 Paragraf */}
               {activeTab === "profil" && (
                 <div className="space-y-8">
                   <InputField name="title" label="Judul Profil" placeholder="Contoh: Mengenal Desa Pabean Udik" />
@@ -150,7 +149,7 @@ export default function DashboardPage() {
                     <label className="text-[9px] uppercase tracking-widest font-bold text-neutral-400">Deskripsi Utama Desa (1 Paragraf)</label>
                     <textarea 
                       name="description" 
-                      placeholder="Tuliskan gambaran umum, sejarah singkat, dan potensi utama desa..." 
+                      placeholder="Tuliskan gambaran umum desa..." 
                       className="border-b py-2 text-sm outline-none resize-none font-light focus:border-[#2C1810]" 
                       rows={6} 
                       required 
@@ -161,7 +160,7 @@ export default function DashboardPage() {
 
               {activeTab === "katalog" && (
                 <div className="space-y-8">
-                   <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 gap-6">
                     <InputField name="nama" label="Nama Produk/Kerajinan" placeholder="Contoh: Batik Tulis Dermayon" />
                     <div className="flex flex-col gap-2">
                       <label className="text-[9px] uppercase tracking-widest font-bold text-neutral-400">Kategori</label>
@@ -174,7 +173,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className="text-[9px] uppercase tracking-widest font-bold text-neutral-400">Deskripsi Produk</label>
-                    <textarea name="deskripsi" placeholder="Ceritakan sejarah atau proses pembuatannya..." className="border-b py-2 text-sm outline-none resize-none font-light focus:border-[#2C1810]" rows={3} required />
+                    <textarea name="deskripsi" placeholder="Ceritakan proses pembuatannya..." className="border-b py-2 text-sm outline-none resize-none font-light focus:border-[#2C1810]" rows={3} required />
                   </div>
                   <div className="grid grid-cols-3 gap-6 pt-4 border-t border-neutral-50">
                     <InputField name="instagram" label="Link Instagram" placeholder="https://instagram.com/..." required={false} />
@@ -200,7 +199,7 @@ export default function DashboardPage() {
               {activeTab === "hero" && (
                 <div className="space-y-8">
                   <InputField name="title" label="Judul Utama (Besar)" placeholder="Contoh: Pesona Pabean Udik" />
-                  <InputField name="subtitle" label="Sub-Judul (Kecil)" placeholder="Contoh: Harmoni Tradisi dan Ekonomi Kreatif" />
+                  <InputField name="subtitle" label="Sub-Judul (Kecil)" placeholder="Contoh: Harmoni Tradisi" />
                 </div>
               )}
 
@@ -220,45 +219,45 @@ export default function DashboardPage() {
                       <img src={preview} className="max-h-56 mx-auto rounded-sm shadow-lg object-cover" alt="Preview" />
                     ) : (
                       <div className="space-y-2">
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 font-bold group-hover:text-black transition-colors">Klik untuk Unggah Gambar</p>
-                        <p className="text-[9px] text-neutral-300 lowercase italic">Format: JPG, PNG, WEBP (Maks 10MB)</p>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 font-bold">Klik untuk Unggah Gambar</p>
+                        <p className="text-[9px] text-neutral-300 lowercase italic">Format: JPG, PNG, WEBP</p>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} className="w-full bg-[#2C1810] text-white py-5 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all disabled:bg-neutral-100 disabled:text-neutral-400 shadow-xl shadow-[#2c1810]/10">
+              <button type="submit" disabled={loading} className="w-full bg-[#2C1810] text-white py-5 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-black transition-all disabled:bg-neutral-100 shadow-xl">
                 {loading ? "Sedang Memproses..." : `Simpan Perubahan ${activeTab}`}
               </button>
             </form>
           </div>
           
           {activeTab !== "profil" && (
-             <div className="bg-white p-10 shadow-sm border border-neutral-100">
-             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold mb-8 border-b pb-4 text-neutral-400">Database Konten Saat Ini</h3>
-             <div className="space-y-2">
-               <AnimatePresence mode="popLayout">
-                 {activeTab === "katalog" && products.map(item => (
-                   <ListItem key={item.id} title={item.nama} sub={item.kategori} img={item.foto} onDelete={async () => { if(confirm("Hapus produk ini?")) { await deleteProduct(item.id); fetchData(); } }} />
-                 ))}
-                 {activeTab === "artikel" && posts.map(item => (
-                   <ListItem key={item.id} title={item.title} sub={item.isFeatured ? "🌟 Featured" : "Standard"} img={item.image} onDelete={async () => { if(confirm("Hapus artikel ini?")) { await deletePost(item.id); fetchData(); } }} />
-                 ))}
-                 {activeTab === "hero" && heroes.map(item => (
-                   <ListItem 
-                     key={item.id} 
-                     title={item.title} 
-                     sub={item.isActive ? "✅ AKTIF" : "NON-AKTIF"} 
-                     img={item.imageUrl} 
-                     onDelete={async () => { if(confirm("Hapus hero ini?")) { await deleteHero(item.id); fetchData(); } }}
-                     onActivate={async () => { await updateHero(item.id); fetchData(); }}
-                     showActivate={!item.isActive}
-                   />
-                 ))}
-               </AnimatePresence>
-             </div>
-           </div>
+            <div className="bg-white p-10 shadow-sm border border-neutral-100">
+              <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold mb-8 border-b pb-4 text-neutral-400">Database Konten</h3>
+              <div className="space-y-2">
+                <AnimatePresence mode="popLayout">
+                  {activeTab === "katalog" && products.map(item => (
+                    <ListItem key={item.id} title={item.nama} sub={item.kategori} img={item.foto} onDelete={async () => { if(confirm("Hapus?")) { await deleteProduct(item.id); fetchData(); } }} />
+                  ))}
+                  {activeTab === "artikel" && posts.map(item => (
+                    <ListItem key={item.id} title={item.title} sub={item.isFeatured ? "🌟 Featured" : "Standard"} img={item.image} onDelete={async () => { if(confirm("Hapus?")) { await deletePost(item.id); fetchData(); } }} />
+                  ))}
+                  {activeTab === "hero" && heroes.map(item => (
+                    <ListItem 
+                      key={item.id} 
+                      title={item.title} 
+                      sub={item.isActive ? "✅ AKTIF" : "NON-AKTIF"} 
+                      img={item.imageUrl} 
+                      onDelete={async () => { if(confirm("Hapus?")) { await deleteHero(item.id); fetchData(); } }}
+                      onActivate={async () => { await updateHero(item.id); fetchData(); }}
+                      showActivate={!item.isActive}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
           )}
         </div>
       </section>
@@ -266,6 +265,7 @@ export default function DashboardPage() {
   );
 }
 
+// Sub-komponen (SidebarButton, InputField, ListItem)
 function SidebarButton({ active, onClick, label, icon }: any) {
   return (
     <button onClick={onClick} className={`w-full text-left text-[10px] uppercase tracking-widest font-bold transition-all flex items-center gap-3 ${active ? "text-[#2C1810] translate-x-2" : "text-neutral-300 hover:text-neutral-500"}`}>
@@ -293,8 +293,8 @@ function ListItem({ title, sub, img, onDelete, onActivate, showActivate }: any) 
   return (
     <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex justify-between items-center py-4 px-4 hover:bg-neutral-50 transition-colors rounded-sm group">
       <div className="flex items-center gap-5">
-        <div className="w-12 h-12 bg-neutral-100 overflow-hidden rounded-sm shadow-inner relative">
-          <img src={img || "/images/placeholder.jpg"} className="w-full h-full object-cover transition-all" alt="" />
+        <div className="w-12 h-12 bg-neutral-100 overflow-hidden rounded-sm relative">
+          <img src={img || "/images/placeholder.jpg"} className="w-full h-full object-cover" alt="" />
         </div>
         <div>
           <p className="text-[10px] font-bold uppercase tracking-widest text-[#2C1810]">{title}</p>
@@ -303,7 +303,7 @@ function ListItem({ title, sub, img, onDelete, onActivate, showActivate }: any) 
       </div>
       <div className="flex gap-6 items-center">
         {showActivate && (
-          <button onClick={onActivate} className="text-[9px] uppercase font-bold text-blue-500 hover:text-blue-700 tracking-tighter transition-colors">Aktifkan</button>
+          <button onClick={onActivate} className="text-[9px] uppercase font-bold text-blue-500 hover:text-blue-700 transition-colors">Aktifkan</button>
         )}
         <button onClick={onDelete} className="text-[9px] uppercase font-bold text-red-300 hover:text-red-600 transition-colors">Hapus</button>
       </div>
