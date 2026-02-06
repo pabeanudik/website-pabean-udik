@@ -1,0 +1,45 @@
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pabean-dark: #2c1810;
+  --pabean-beige: #f9f7f2;
+}
+
+/* Base Styles */
+body {
+  background-color: #ffffff;
+  color: #2c1810;
+  margin: 0;
+  /* Pastikan variabel --font-inter sudah didefinisikan di layout.tsx */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Transisi halus global */
+/* Gunakan transition-property secara spesifik jika performa melambat */
+* {
+  transition: background-color 500ms cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 500ms cubic-bezier(0.4, 0, 0.2, 1), 
+              color 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Selection */
+::selection {
+  background-color: #2c1810;
+  color: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Utilitas tambahan untuk estetika KKN Pabean Udik */
+@layer components {
+  .pabean-card {
+    @apply bg-white border border-neutral-100 shadow-sm transition-all hover:shadow-md;
+  }
+}
