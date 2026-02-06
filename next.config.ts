@@ -3,12 +3,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // Mengabaikan error TypeScript saat build di Vercel
-    ignoreBuildErrors: true, 
+    ignoreBuildErrors: true,
   },
+  // @ts-ignore
   eslint: {
-    // Mengabaikan error ESLint saat build di Vercel
     ignoreDuringBuilds: true,
+  },
+  // TAMBAHKAN INI:
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // Naikin jadi 10 MB
+    },
   },
 };
 
