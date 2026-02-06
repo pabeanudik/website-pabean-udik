@@ -6,17 +6,26 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { notFound } from "next/navigation";
 
-export default async function DetailProduk({ params }: { params: { slug: string } }) {
-  // 1. Ambil data produk berdasarkan slug menggunakan Drizzle
+// 1. Definisikan tipe Props sesuai standar Next.js 15
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function DetailProduk({ params }: PageProps) {
+  // 2. WAJIB di-await sebelum digunakan
+  const { slug } = await params;
+
+  // 3. Ambil data produk berdasarkan slug
+  // Catatan: Jika kamu simpan slug sebagai ID di database, gunakan eq(products.id, parseInt(slug))
   const data = await db
     .select()
     .from(products)
-    .where(eq(products.slug, params.slug))
+    .where(eq(products.slug, slug))
     .limit(1);
 
   const product = data[0];
 
-  // 2. Jika produk tidak ditemukan, arahkan ke halaman 404
+  // 4. Jika produk tidak ditemukan, arahkan ke halaman 404
   if (!product) notFound();
 
   return (
@@ -25,7 +34,7 @@ export default async function DetailProduk({ params }: { params: { slug: string 
       <div className="max-w-7xl mx-auto px-6 pt-40 pb-24">
         <div className="grid md:grid-cols-2 gap-16">
           
-          {/* Visual Produk: Menjaga aspek rasio agar tidak stretch */}
+          {/* Visual Produk */}
           <div className="aspect-square bg-neutral-100 overflow-hidden shadow-sm">
             <img 
               src={product.foto} 
