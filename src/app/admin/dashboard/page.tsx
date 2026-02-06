@@ -7,6 +7,10 @@ import { createProduct, deleteProduct } from "@/lib/actions/product";
 import { createPost, deletePost, updateHero, createHero, deleteHero, updateProfile } from "@/lib/actions/cms"; 
 import { motion, AnimatePresence } from "framer-motion";
 
+export const dynamic = "force-dynamic";
+
+export default function DashboardPage() {
+
 type TabType = "hero" | "artikel" | "katalog" | "profil";
 
 export default function DashboardPage() {
