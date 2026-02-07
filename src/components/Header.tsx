@@ -43,9 +43,9 @@ export default function Header() {
         <Link 
           href="/" 
           onClick={closeMenu}
-          className="text-lg font-serif tracking-[0.0em] font-bold italic text-[#2C1810] relative z-[110]"
+          className="text-lg font-serif tracking-[0.0em] font-bold text-[#2C1810] relative z-[110]"
         >
-          Pabean Udik
+          Info Pabean Udik
         </Link>
 
         {/* Navigasi Desktop */}
